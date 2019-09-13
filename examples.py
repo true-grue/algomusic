@@ -3,7 +3,7 @@
 from algomusic import *
 
 def drums1():
-    # Простая барабанная партия
+    # РџСЂРѕСЃС‚Р°СЏ Р±Р°СЂР°Р±Р°РЅРЅР°СЏ РїР°СЂС‚РёСЏ
     v1 = Kick_voice()
     v2 = Snare_voice()
     out = []
@@ -13,12 +13,12 @@ def drums1():
 
     write_wav("drums1.wav", out)
 
-# Перевод смещения ноты от С-4, с учетом гаммы и транспонирования, в герцы
+# РџРµСЂРµРІРѕРґ СЃРјРµС‰РµРЅРёСЏ РЅРѕС‚С‹ РѕС‚ РЎ-4, СЃ СѓС‡РµС‚РѕРј РіР°РјРјС‹ Рё С‚СЂР°РЅСЃРїРѕРЅРёСЂРѕРІР°РЅРёСЏ, РІ РіРµСЂС†С‹
 def note2freq(offs, scale, trans=0):
     note = scale[offs % len(scale)] + 12 * (offs // len(scale))
     return midi2freq(60 + note + trans)
 
-def get_note(): # Случайная нота из пентатоники
+def get_note(): # РЎР»СѓС‡Р°Р№РЅР°СЏ РЅРѕС‚Р° РёР· РїРµРЅС‚Р°С‚РѕРЅРёРєРё
     n = random.randint(0, 11)
     return note2freq(n, MIN_PENTA_SCALE)
 
@@ -28,7 +28,7 @@ def wind_chime():
     out = []
 
     for i in range(100):
-        vol = random.randint(3, 10) * 0.1 # Громкость варьируется
+        vol = random.randint(3, 10) * 0.1 # Р“СЂРѕРјРєРѕСЃС‚СЊ РІР°СЂСЊРёСЂСѓРµС‚СЃСЏ
         out += d1.play(v1.play(get_note(), sec(0.3), sec(0.3), amp=vol), 0.3, 0.85)
 
     write_wav("wind_chime.wav", out)
@@ -40,7 +40,7 @@ class Muse:
         self.rows = [0, 1] + [0] * 38
         self.scale = parse_track("c-3 d-3 e-3 f-3 g-3 a-3 b-3 c-4 c-4 d-4 e-4 f-4 g-4 a-4 b-4 c-5")
         self.clock = 1
-    
+
     def get_freq(self):
         values = [self.rows[i] for i in self.interval_sliders]
         return self.scale[sum([x * 2**i for i, x in enumerate(values)])]
@@ -48,7 +48,7 @@ class Muse:
     def update_lfsr(self):
         xor = sum([self.rows[i] for i in self.theme_sliders]) % 2
         self.rows = self.rows[:9] + [xor ^ 1] + self.rows[9:-1]
-    
+
     def pulse(self):
         self.clock += 1
         self.rows[2] = self.clock & 1
@@ -78,7 +78,7 @@ def muse():
         new_freq = m.get_freq() * 4
         if new_freq == freq:
             new_freq = None
-        else:       
+        else:
             freq = new_freq
         out += d1.play(v1.play(new_freq, sec(0.3), tempo), 0.4)
         m.pulse()
@@ -86,7 +86,7 @@ def muse():
     write_wav("muse.wav", out)
 
 def musinum():
-    step = 65 # Шаг задает номер "композиции"
+    step = 65 # РЁР°Рі Р·Р°РґР°РµС‚ РЅРѕРјРµСЂ "РєРѕРјРїРѕР·РёС†РёРё"
     num = 0
     tempo = sec(0.12)
     v1 = Voice(LFSR(4, [3, 0]), Env(0.01))
@@ -95,7 +95,7 @@ def musinum():
     f2 = LP1()
     out = []
 
-    for i in range(200): # Алгоритм MusiNum в действии
+    for i in range(200): # РђР»РіРѕСЂРёС‚Рј MusiNum РІ РґРµР№СЃС‚РІРёРё
         freq = note2freq(bin(num).count("1"), MAJ_SCALE, 24)
         p = v1.play(freq, tempo, tempo, amp=1 if i % 4 == 0 else 0.7)
         out += d1.play(f1.play(f2.play(p, 0.4), 0.4), 0.35, 0.7)
@@ -103,16 +103,16 @@ def musinum():
 
     write_wav("musinum.wav", out)
 
-def similar(data, rule, times): # Порождение мелодии из исходных данных по правилу rules, times итераций
+def similar(data, rule, times): # РџРѕСЂРѕР¶РґРµРЅРёРµ РјРµР»РѕРґРёРё РёР· РёСЃС…РѕРґРЅС‹С… РґР°РЅРЅС‹С… РїРѕ РїСЂР°РІРёР»Сѓ rules, times РёС‚РµСЂР°С†РёР№
     for i in range(times):
         new = []
         for x in data:
-            new += [x + offs for offs in rule] # замена очередной ноты по правилу
+            new += [x + offs for offs in rule] # Р·Р°РјРµРЅР° РѕС‡РµСЂРµРґРЅРѕР№ РЅРѕС‚С‹ РїРѕ РїСЂР°РІРёР»Сѓ
         data = new
     return data
 
 def fractal():
-    # Фрактальный генератор мелодий
+    # Р¤СЂР°РєС‚Р°Р»СЊРЅС‹Р№ РіРµРЅРµСЂР°С‚РѕСЂ РјРµР»РѕРґРёР№
     #rule = [0, 1, -1, 0]
     #rule = [-2, 7, -7, 2]
     rule = [0, 2, 4, -7]
@@ -130,7 +130,7 @@ def fractal():
     write_wav("fractal.wav", out)
 
 def drums2():
-    # # Вероятностные барабаны
+    # # Р’РµСЂРѕСЏС‚РЅРѕСЃС‚РЅС‹Рµ Р±Р°СЂР°Р±Р°РЅС‹
     kick_break = [
         10, 0.4, None, None, 0.7, None, 0.8, None, None, None, None, None, 0.9, None, None, None,
         0.9, None, None, None, 0.9, None, 0.9, None, None, None, 0.9, None, 0.6, None, None, None
@@ -149,7 +149,7 @@ def drums2():
     out = []
     busy = 0.8
 
-    for j in range(16): # Барабанные вариации
+    for j in range(16): # Р‘Р°СЂР°Р±Р°РЅРЅС‹Рµ РІР°СЂРёР°С†РёРё
         for i in range(len(kick_break)):
             is_kick = kick_break[i] is not None and random.random() < kick_break[i] * busy
             is_snare = snare_break[i] is not None and random.random() < snare_break[i] * busy
@@ -161,8 +161,8 @@ def drums2():
 
     write_wav("drums2.wav", out)
 
-# Порождение ритма в духе "Уральских напевов"
-def make_bar(size, durations): # Заполнение такта длительностями из durations
+# РџРѕСЂРѕР¶РґРµРЅРёРµ СЂРёС‚РјР° РІ РґСѓС…Рµ "РЈСЂР°Р»СЊСЃРєРёС… РЅР°РїРµРІРѕРІ"
+def make_bar(size, durations): # Р—Р°РїРѕР»РЅРµРЅРёРµ С‚Р°РєС‚Р° РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЏРјРё РёР· durations
     bar = []
     while sum(bar) < size:
         d = random.choice(durations)
@@ -170,8 +170,8 @@ def make_bar(size, durations): # Заполнение такта длительностями из durations
             bar += d
     return bar
 
-def next_note(note, intervals, note_range): # Выбор очередной ноты, случайное блуждание
-    while True: 
+def next_note(note, intervals, note_range): # Р’С‹Р±РѕСЂ РѕС‡РµСЂРµРґРЅРѕР№ РЅРѕС‚С‹, СЃР»СѓС‡Р°Р№РЅРѕРµ Р±Р»СѓР¶РґР°РЅРёРµ
+    while True:
         ivals, iprobs, idir = intervals
         direction = 2 * int(random.random() < idir) - 1
         new_note = note + random.choices(ivals, iprobs)[0] * direction
@@ -179,14 +179,14 @@ def next_note(note, intervals, note_range): # Выбор очередной ноты, случайное бл
             return new_note
 
 def funk():
-    # Алгоритмический фанк
+    # РђР»РіРѕСЂРёС‚РјРёС‡РµСЃРєРёР№ С„Р°РЅРє
     intervals = [
         [1, 2, 3, 4, 5, 6],
         [0.5, 0.4, 0.03, 0.03, 0.03, 0.01],
         0.6
     ]
 
-    # Набор длительностей для построения такта
+    # РќР°Р±РѕСЂ РґР»РёС‚РµР»СЊРЅРѕСЃС‚РµР№ РґР»СЏ РїРѕСЃС‚СЂРѕРµРЅРёСЏ С‚Р°РєС‚Р°
     durations = [[1/4], [1/2], [1/8, 1/8], [1/4 + 1/8, 1/8], [1/16, 1/16], [1/8 + 1/16, 1/16]]
 
     v1 = Voice(LFSR(4, [3, 0]), Env())
@@ -206,7 +206,7 @@ def funk():
     drums = drums * (1 + len(out) // len(drums))
     write_wav("funk.wav", mix(drums[:len(out)], out))
 
-# 7 ступеней, 49 риффов
+# 7 СЃС‚СѓРїРµРЅРµР№, 49 СЂРёС„С„РѕРІ
 def split_by(lst, n): return [lst[i: i + n] for i in range(0, len(lst), n)]
 
 def riffology():
@@ -220,11 +220,11 @@ def riffology():
     row = random.randint(0, len(riffs) - 1)
 
     for i in range(32):
-        col = random.randint(0, len(riffs) - 1) # Выбор нового риффа
+        col = random.randint(0, len(riffs) - 1) # Р’С‹Р±РѕСЂ РЅРѕРІРѕРіРѕ СЂРёС„С„Р°
         riff = riffs[row][col]
-        row = col # Выбор ступени
+        row = col # Р’С‹Р±РѕСЂ СЃС‚СѓРїРµРЅРё
         dur = tempo if random.random() < 0.7 else tempo * 2
-        for freq in riff[:-1]: # Последняя нота риффа заменяется первой нотой нового риффа
+        for freq in riff[:-1]: # РџРѕСЃР»РµРґРЅСЏСЏ РЅРѕС‚Р° СЂРёС„С„Р° Р·Р°РјРµРЅСЏРµС‚СЃСЏ РїРµСЂРІРѕР№ РЅРѕС‚РѕР№ РЅРѕРІРѕРіРѕ СЂРёС„С„Р°
             out += d1.play(f1.play(v1.play(freq * 4, dur * 1.2, dur), 0.3), 0.3, 0.7)
 
     fs, drums = read_wav("drums1.wav")
@@ -233,7 +233,7 @@ def riffology():
     write_wav("riffology.wav", mix(out, out, drums[:len(out)]))
 
 def oneliner():
-    # Однострочные алгоритмические композиции
+    # РћРґРЅРѕСЃС‚СЂРѕС‡РЅС‹Рµ Р°Р»РіРѕСЂРёС‚РјРёС‡РµСЃРєРёРµ РєРѕРјРїРѕР·РёС†РёРё
     #def f(t): return t * (t >> 11) * t / 3
     #def f(t): return div(t, (t & (t >> 12)))
     #def f(t): return (div(t, ( t >> 16 | t >> 8)) & (( t >> 5 | t >> 11))) -1 | t * (( t >> 16 | t >> 8))
