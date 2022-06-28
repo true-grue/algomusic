@@ -1,5 +1,7 @@
 # algomusic
 
+https://youtu.be/WNs8t5Yjm7o
+
 ```
 from traitlets.config.manager import BaseJSONConfigManager
 from pathlib import Path
